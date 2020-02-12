@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
+import Colors from '../../../../assets/colors/colors'
 import {
   TouchableOpacity,
   ImageBackground,
@@ -8,6 +9,7 @@ import {
   ImagePropTypes,
   Linking,
   StyleSheet,
+  View,
 } from 'react-native';
 
 import { DEFAULT_WIDTH, TYPES } from './constants';
@@ -25,6 +27,7 @@ export default class Thumbnail extends PureComponent {
   static propTypes = {
     ...ImageBackground.propTypes,
     children: PropTypes.node,
+    imageStyle: ViewPropTypes.style,
     containerStyle: ViewPropTypes.style,
     imageHeight: PropTypes.oneOfType([
       PropTypes.number,
@@ -40,6 +43,7 @@ export default class Thumbnail extends PureComponent {
     style: ViewPropTypes.style,
     type: PropTypes.oneOf(Object.keys(TYPES)),
     url: PropTypes.string.isRequired,
+    playIcon: PropTypes.func,
     showPlayIcon: PropTypes.bool
   };
 
@@ -47,14 +51,14 @@ export default class Thumbnail extends PureComponent {
     type: 'high',
     imageHeight: 200,
     imageWidth: DEFAULT_WIDTH,
-    onPressError: () => {},
+    onPressError: () => { },
     showPlayIcon: true
   };
 
   static getDerivedStateFromProps(nextProps, prevState) {
     const videoId = getVideoId(nextProps.url);
 
-    if(videoId !== prevState.videoId){
+    if (videoId !== prevState.videoId) {
       return { videoId };
     }
 
@@ -92,7 +96,7 @@ export default class Thumbnail extends PureComponent {
   render() {
     const { videoId } = this.state;
 
-    if(!videoId){
+    if (!videoId) {
       if (process.env.NODE_ENV !== 'production') {
         console.warn(`Invalid "url" could not extract videoId from "${this.props.url}"`);
       }
@@ -101,51 +105,49 @@ export default class Thumbnail extends PureComponent {
     }
 
     const {
+      imageStyle,
       imageWidth,
       imageHeight,
       containerStyle,
       iconStyle,
       children,
       showPlayIcon,
+      playIcon,
+      onPress,
       ...props
     } = this.props;
 
     const imageURL = `https://img.youtube.com/vi/${videoId}/${this.getType()}.jpg`;
 
     return (
-      <TouchableOpacity
-        activeOpacity={0.7}
-        style={containerStyle}
-        onPress={this.onPress}
+      <ImageBackground
+        source={{ uri: imageURL }}
+        imageStyle={imageStyle}
+        style={[
+          styles.imageContainer,
+          {
+            width: imageWidth,
+            height: imageHeight,
+          },
+        ]}
+        testId='thumbnail-image-background'
+        {...props}
       >
-        <ImageBackground
-          source={{ uri: imageURL }}
-          style={[
-            styles.imageContainer,
-            {
-              width: imageWidth,
-              height: imageHeight,
-            },
-          ]}
-          testId='thumbnail-image-background'
-          {...props}
-        >
+        <View style={[styles.content, styles.videoImage, styles.overlayImage]} />
         {
           showPlayIcon ? (
             <Image
-              source={require('../assets/play.png')}
+              source={playIcon}
               style={[styles.playIcon, iconStyle]}
               testId='thumbnail-image'
             />
           ) : (
-            null
-          )
+              null
+            )
         }
-
-
-          {children}
-        </ImageBackground>
-      </TouchableOpacity>
+        
+        {children}
+      </ImageBackground>
     );
   }
 }
@@ -154,8 +156,25 @@ const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 10,
   },
   playIcon: {
     tintColor: 'white',
+  },
+  content: {
+    borderWidth: 0,
+    margin: 0,
+    width: '100%',
+    height: '100%',
+    padding: 0
+  },
+  videoImage: {
+    position: 'absolute',
+    borderWidth: 0,
+    borderRadius: 10,
+  },
+  overlayImage: {
+    backgroundColor: Colors.primaryDark,
+    opacity: 0.5
   },
 });
