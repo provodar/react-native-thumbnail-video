@@ -174,6 +174,6 @@ const styles = StyleSheet.create({
   },
   overlayImage: {
     backgroundColor: '#000',
-    opacity: 0.5
+    opacity: 0
   },
 });
