@@ -1,6 +1,5 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import Colors from '../../../../assets/colors/colors'
 import {
   TouchableOpacity,
   ImageBackground,
@@ -174,7 +173,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   overlayImage: {
-    backgroundColor: Colors.primaryDark,
+    backgroundColor: '#000',
     opacity: 0.5
   },
 });
